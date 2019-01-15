@@ -298,6 +298,53 @@ namespace Projekt4_Aproksymacja
             return result;
         }
 
+        public double[] GaussSeidelSparseIterationAlgorithm(double precision)
+        {
+            int iterationCounter = 0;
+            double[] result = new double[Matrix.Rows];
+            double[] previous = new double[Matrix.Rows];
+            double value = 0;
+
+            for (int i = 0; i < Matrix.Rows; i++)
+            {
+                result[i] = 0;
+                previous[i] = 0;
+            }
+
+            while (true)
+            {
+                for (int i = 0; i < Matrix.Rows; i++)
+                {
+                    double sum = Vector.Values[i];
+
+                    for (int j = 0; j < Matrix.Rows; j++)
+                    {
+                        if (j != i)
+                        {
+                            value = Matrix.Matrix[i, j];
+                            value *= result[j];
+                            sum -= value;
+                        }
+                    }
+                    value = Matrix.Matrix[i, i];
+                    result[i] = 1 / value * sum;
+                }
+                iterationCounter++;
+
+                bool stop = true;
+                for (int i = 0; i < Matrix.Rows; i++)
+                    if (Math.Abs(result[i] - previous[i]) > precision)
+                        stop = false;
+
+                if (stop)
+                    break;
+
+                for (int i = 0; i < Matrix.Rows; i++)
+                    previous[i] = result[i];
+            }
+            return result;
+        }
+
         public static double CalculatePrecision(MyMatrix matrix, MyVector vector, Algorithm algo)
         {
             LinearEquation le = new LinearEquation(matrix, vector);

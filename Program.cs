@@ -4,6 +4,7 @@ using System.Linq;
 using System.IO;
 using System.Text;
 using MathNet.Numerics.LinearAlgebra.Double;
+using MathNet.Numerics.LinearAlgebra.Double.Solvers;
 
 namespace Projekt4_Aproksymacja
 {
@@ -39,8 +40,8 @@ namespace Projekt4_Aproksymacja
             building.Append("Agenci;Metoda;Czas budowania\n");
             working.Append("Agenci;Metoda;Czas rozwiazywania\n");
 
-            int start = 15;
-            int maxAgents = 61;
+            int start = 5;
+            int maxAgents = 25;
 
             double[,] gaussTimes = new Double[maxAgents + 1, 2];
             double[,] optimizedGaussTimes = new Double[maxAgents + 1, 2];
@@ -174,8 +175,10 @@ namespace Projekt4_Aproksymacja
             #region Zad 3
             double resultBuildGauss, resultGauss, resultBuildOptimizedGauss, resultOptimizedGauss, resultBuildGaussSeidel, resultGaussSeidel, resultBuildMathNet, resultMathNet, appBuildError, appError;
             double gaussBuildError = 0, gaussError = 0, optimizedGaussBuildError = 0, optimizedGaussError = 0, gaussSeidelBuildError = 0, gaussSeidelError = 0, mathNetBuildError = 0, mathNetError = 0;
+
             StringBuilder approximationError = new StringBuilder();
             approximationError.Append("Agenci;Metoda;Czas budowania - przyblizony;Czas budowania - rzeczywisty;Blad budowania;Czas rozwiazania - przyblizony;Czas rozwiazania - rzeczywisty;Blad rozwiazania\n");
+
             for (int i = start + 5; i <= maxAgents; i++)
             {
                 resultBuildGauss = (gaussBuildApproximation.ElementAt(3) * Math.Pow(i, 3)) +
@@ -186,8 +189,8 @@ namespace Projekt4_Aproksymacja
                     (gaussApproximation.ElementAt(2) * Math.Pow(i, 2)) +
                     (gaussApproximation.ElementAt(1) * i) +
                     gaussApproximation.ElementAt(0);
-                appBuildError = Math.Abs(resultBuildGauss - gaussTimes[i,0]);
-                appError = Math.Abs(resultGauss - gaussTimes[i, 1]);
+                appBuildError = Math.Abs((resultBuildGauss - gaussTimes[i, 0])) / Math.Abs(resultBuildGauss);
+                appError = Math.Abs((resultGauss - gaussTimes[i, 1])) / Math.Abs(resultGauss);
                 gaussBuildError += appBuildError; gaussError += appError;
                 approximationError.Append(i + ";Gauss;" + resultBuildGauss + ";" + gaussTimes[i, 0] + ";" + appBuildError + ";" + resultGauss + ";" + gaussTimes[i, 1] + ";" + appError + "\n");
 
@@ -197,8 +200,8 @@ namespace Projekt4_Aproksymacja
                 resultOptimizedGauss = (oGaussApproximation.ElementAt(2) * Math.Pow(i, 2)) +
                     (oGaussApproximation.ElementAt(1) * i) +
                     oGaussApproximation.ElementAt(0);
-                appBuildError = Math.Abs(resultBuildOptimizedGauss - optimizedGaussTimes[i, 0]);
-                appError = Math.Abs(resultOptimizedGauss - optimizedGaussTimes[i, 1]);
+                appBuildError = Math.Abs((resultBuildOptimizedGauss - optimizedGaussTimes[i, 0])) / Math.Abs(resultBuildOptimizedGauss);
+                appError = Math.Abs((resultOptimizedGauss - optimizedGaussTimes[i, 1])) / Math.Abs(resultOptimizedGauss);
                 optimizedGaussBuildError += appBuildError; optimizedGaussError += appError;
                 approximationError.Append(i + ";Gauss zoptymalizowany;" + resultBuildOptimizedGauss + ";" + optimizedGaussTimes[i, 0] + ";" + appBuildError + ";" + resultOptimizedGauss + ";" + optimizedGaussTimes[i, 1] + ";" + appError + "\n");
 
@@ -208,8 +211,8 @@ namespace Projekt4_Aproksymacja
                 resultGaussSeidel = (gaussSeidelApproximation.ElementAt(2) * Math.Pow(i, 2)) +
                     (gaussSeidelApproximation.ElementAt(1) * i) +
                     gaussSeidelApproximation.ElementAt(0);
-                appBuildError = Math.Abs(resultBuildGaussSeidel - gaussSeidelTimes[i, 0]);
-                appError = Math.Abs(resultGaussSeidel - gaussSeidelTimes[i, 1]);
+                appBuildError = Math.Abs((resultBuildGaussSeidel - gaussSeidelTimes[i, 0])) / Math.Abs(resultBuildGaussSeidel);
+                appError = Math.Abs((resultGaussSeidel - gaussSeidelTimes[i, 1])) / Math.Abs(resultGaussSeidel);
                 gaussSeidelBuildError += appBuildError; gaussSeidelError += appError;
                 approximationError.Append(i + ";Gauss-Seidel;" + resultBuildGaussSeidel + ";" + gaussSeidelTimes[i, 0] + ";" + appBuildError + ";" + resultGaussSeidel + ";" + gaussSeidelTimes[i, 1] + ";" + appError + "\n");
 
@@ -217,17 +220,19 @@ namespace Projekt4_Aproksymacja
                     mathNetBuildApproximation.ElementAt(0);
                 resultMathNet = (mathNetApproximation.ElementAt(1) * i) +
                     mathNetApproximation.ElementAt(0);
-                appBuildError = Math.Abs(resultBuildMathNet - mathNetTimes[i, 0]);
-                appError = Math.Abs(resultMathNet - mathNetTimes[i, 1]);
+                appBuildError = Math.Abs((resultBuildMathNet - mathNetTimes[i, 0])) / Math.Abs(resultBuildMathNet);
+                appError = Math.Abs((resultMathNet - mathNetTimes[i, 1])) / Math.Abs(resultMathNet);
                 mathNetBuildError += appBuildError; mathNetError += appError;
                 approximationError.Append(i + ";Biblioteka MathNet;" + resultBuildMathNet + ";" + mathNetTimes[i, 0] + ";" + appBuildError + ";" + resultMathNet + ";" + mathNetTimes[i, 1] + ";" + appError + "\n");
             }
             int amount = maxAgents - (start + 5);
+
             approximationError.Append("Metoda;Sredni blad budowania [s]; Sredni blad rozwiazywania [s]\n");
             approximationError.Append("Gauss;" + gaussBuildError / (amount * 1000) + ";" + gaussError / (amount * 1000) + "\n");
             approximationError.Append("Gauss zoptymalizowany;" + optimizedGaussBuildError / (amount * 1000) + ";" + optimizedGaussError / (amount * 1000) + "\n");
             approximationError.Append("Gauss-Seidel;" + gaussSeidelBuildError / (amount * 1000) + ";" + gaussSeidelError / (amount * 1000) + "\n");
             approximationError.Append("Biblioteka MathNet;" + mathNetBuildError / (amount * 1000) + ";" + mathNetError / (amount * 1000) + "\n");
+
             File.Delete("wynikiApro/approximationError.csv");
             File.AppendAllText("wynikiApro/approximationError.csv", approximationError.ToString());
             #endregion
@@ -288,10 +293,10 @@ namespace Projekt4_Aproksymacja
             #endregion
             #region Zad 5
 
-            StringBuilder work100k = new StringBuilder();
-            work100k.Append("Metoda;Czas;Czas przewidywany\n");
+            StringBuilder maxWork = new StringBuilder();
+            maxWork.Append("Metoda;Czas budowania;Czas rozwiazania;Przewidywany czas budowania;Przewidywany czas rozwiazania\n");
 
-            agents = 120;
+            agents = 45;
 
             watch = System.Diagnostics.Stopwatch.StartNew();
             le1 = new LinearEquation(agents);
@@ -307,10 +312,9 @@ namespace Projekt4_Aproksymacja
                 oGaussBuildApproximation.ElementAt(0);
             resultOptimizedGauss = (oGaussApproximation.ElementAt(2) * Math.Pow(agents, 2)) +
                 (oGaussApproximation.ElementAt(1) * agents) +
-                oGaussApproximation.ElementAt(0) + resultBuildOptimizedGauss;
+                oGaussApproximation.ElementAt(0);
 
-            workTime += buildTime;
-            work100k.Append("Gauss zoptymalizowany;" + workTime + ";" + resultOptimizedGauss + "\n");
+            maxWork.Append("Gauss zoptymalizowany;" + buildTime + ";" + workTime + ";"+ resultBuildOptimizedGauss + ";" + resultOptimizedGauss + "\n");
 
             watch = System.Diagnostics.Stopwatch.StartNew();
             le1 = new LinearEquation(agents);
@@ -327,12 +331,11 @@ namespace Projekt4_Aproksymacja
             resultBuildMathNet = (mathNetBuildApproximation.ElementAt(1) * agents) +
                 mathNetBuildApproximation.ElementAt(0);
             resultMathNet = (mathNetApproximation.ElementAt(1) * agents) +
-                mathNetApproximation.ElementAt(0) + resultBuildMathNet;
-            workTime += buildTime;
-            work100k.Append("Biblioteka MathNet;" + workTime + ";" + resultMathNet + "\n");
+                mathNetApproximation.ElementAt(0);
+            maxWork.Append("Biblioteka MathNet;" + buildTime + ";" + workTime + ";" + resultBuildMathNet + ";" + resultMathNet + "\n");
 
             File.Delete("wynikiApro/maxWork.csv");
-            File.AppendAllText("wynikiApro/maxWork.csv", work100k.ToString());
+            File.AppendAllText("wynikiApro/maxWork.csv", maxWork.ToString());
             #endregion
             Console.WriteLine("END");
             Console.Read();
