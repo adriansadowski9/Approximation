@@ -36,12 +36,14 @@ namespace Projekt4_Aproksymacja
             List<Double> mathNetBuildRange = new List<Double>();
 
             #region Zad 1
+
+            Console.WriteLine("Wykonuje zadanie 1");
             StringBuilder building = new StringBuilder(), working = new StringBuilder();
             building.Append("Agenci;Metoda;Czas budowania\n");
             working.Append("Agenci;Metoda;Czas rozwiazywania\n");
 
-            int start = 5;
-            int maxAgents = 25;
+            int start = 15;
+            int maxAgents = 61;
 
             double[,] gaussTimes = new Double[maxAgents + 1, 2];
             double[,] optimizedGaussTimes = new Double[maxAgents + 1, 2];
@@ -117,8 +119,8 @@ namespace Projekt4_Aproksymacja
                 // Biblioteka MathNet
                 watch = System.Diagnostics.Stopwatch.StartNew();
                 le1 = new LinearEquation(i);
-                var A = SparseMatrix.Build.DenseOfArray(le1.Matrix.Matrix);
-                var b = Vector.Build.Dense(le1.Vector.Values);
+                var A = SparseMatrix.Build.SparseOfArray(le1.Matrix.Matrix);
+                var b = SparseVector.Build.SparseOfEnumerable(le1.Vector.Values);
                 watch.Stop();
                 buildTime = watch.Elapsed.TotalMilliseconds;
 
@@ -146,6 +148,7 @@ namespace Projekt4_Aproksymacja
             #endregion
             #region Zad 2
 
+            Console.WriteLine("Wykonuje zadanie 2");
             StringBuilder coefficients = new StringBuilder();
             coefficients.Append("Metoda;Wspolczynniki\n");
 
@@ -172,14 +175,17 @@ namespace Projekt4_Aproksymacja
             File.Delete("wynikiApro/wspolczynniki.csv");
             File.AppendAllText("wynikiApro/wspolczynniki.csv", coefficients.ToString());
 
+            #endregion
             #region Zad 3
+
+            Console.WriteLine("Wykonuje zadanie 3");
             double resultBuildGauss, resultGauss, resultBuildOptimizedGauss, resultOptimizedGauss, resultBuildGaussSeidel, resultGaussSeidel, resultBuildMathNet, resultMathNet, appBuildError, appError;
             double gaussBuildError = 0, gaussError = 0, optimizedGaussBuildError = 0, optimizedGaussError = 0, gaussSeidelBuildError = 0, gaussSeidelError = 0, mathNetBuildError = 0, mathNetError = 0;
 
             StringBuilder approximationError = new StringBuilder();
             approximationError.Append("Agenci;Metoda;Czas budowania - przyblizony;Czas budowania - rzeczywisty;Blad budowania;Czas rozwiazania - przyblizony;Czas rozwiazania - rzeczywisty;Blad rozwiazania\n");
 
-            for (int i = start + 5; i <= maxAgents; i++)
+            for (int i = start; i <= maxAgents; i++)
             {
                 resultBuildGauss = (gaussBuildApproximation.ElementAt(3) * Math.Pow(i, 3)) +
                     (gaussBuildApproximation.ElementAt(2) * Math.Pow(i, 2)) +
@@ -225,7 +231,7 @@ namespace Projekt4_Aproksymacja
                 mathNetBuildError += appBuildError; mathNetError += appError;
                 approximationError.Append(i + ";Biblioteka MathNet;" + resultBuildMathNet + ";" + mathNetTimes[i, 0] + ";" + appBuildError + ";" + resultMathNet + ";" + mathNetTimes[i, 1] + ";" + appError + "\n");
             }
-            int amount = maxAgents - (start + 5);
+            int amount = maxAgents - start;
 
             approximationError.Append("Metoda;Sredni blad budowania [s]; Sredni blad rozwiazywania [s]\n");
             approximationError.Append("Gauss;" + gaussBuildError / (amount * 1000) + ";" + gaussError / (amount * 1000) + "\n");
@@ -235,10 +241,11 @@ namespace Projekt4_Aproksymacja
 
             File.Delete("wynikiApro/approximationError.csv");
             File.AppendAllText("wynikiApro/approximationError.csv", approximationError.ToString());
-            #endregion
 
             #endregion
             #region Zad 4 
+
+            Console.WriteLine("Wykonuje zadanie 4");
             StringBuilder prediction = new StringBuilder();
             int size = 100000;
             int agents = 0, tempSize = 1;
@@ -290,36 +297,19 @@ namespace Projekt4_Aproksymacja
 
             File.Delete("wynikiApro/100kPrediction.csv");
             File.AppendAllText("wynikiApro/100kPrediction.csv", prediction.ToString());
+
             #endregion
             #region Zad 5
-
+            Console.WriteLine("Wykonuje zadanie 5");
             StringBuilder maxWork = new StringBuilder();
             maxWork.Append("Metoda;Czas budowania;Czas rozwiazania;Przewidywany czas budowania;Przewidywany czas rozwiazania\n");
 
-            agents = 45;
+            agents = 155;
 
             watch = System.Diagnostics.Stopwatch.StartNew();
             le1 = new LinearEquation(agents);
-            watch.Stop();
-            buildTime = watch.Elapsed.TotalMilliseconds;
-            watch = System.Diagnostics.Stopwatch.StartNew();
-            le1.SolveEquationPartialPivotingAlgorithm(true);
-            watch.Stop();
-            workTime = watch.Elapsed.TotalMilliseconds;
-
-            resultBuildOptimizedGauss = (oGaussBuildApproximation.ElementAt(2) * Math.Pow(agents, 2)) +
-                (oGaussBuildApproximation.ElementAt(1) * agents) +
-                oGaussBuildApproximation.ElementAt(0);
-            resultOptimizedGauss = (oGaussApproximation.ElementAt(2) * Math.Pow(agents, 2)) +
-                (oGaussApproximation.ElementAt(1) * agents) +
-                oGaussApproximation.ElementAt(0);
-
-            maxWork.Append("Gauss zoptymalizowany;" + buildTime + ";" + workTime + ";"+ resultBuildOptimizedGauss + ";" + resultOptimizedGauss + "\n");
-
-            watch = System.Diagnostics.Stopwatch.StartNew();
-            le1 = new LinearEquation(agents);
-            var C = SparseMatrix.Build.DenseOfArray(le1.Matrix.Matrix);
-            var d = Vector.Build.Dense(le1.Vector.Values);
+            var C = SparseMatrix.Build.SparseOfArray(le1.Matrix.Matrix);
+            var d = SparseVector.Build.SparseOfEnumerable(le1.Vector.Values);
             watch.Stop();
             buildTime = watch.Elapsed.TotalMilliseconds;
 
@@ -336,7 +326,9 @@ namespace Projekt4_Aproksymacja
 
             File.Delete("wynikiApro/maxWork.csv");
             File.AppendAllText("wynikiApro/maxWork.csv", maxWork.ToString());
+
             #endregion
+
             Console.WriteLine("END");
             Console.Read();
         }
